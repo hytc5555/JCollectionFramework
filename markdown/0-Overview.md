@@ -28,29 +28,19 @@ public interface Iterable<T> {
     //返回遍历迭代器
     Iterator<T> iterator();
     
-    //1.8新增接口，循环
-    default void forEach(Consumer<? super T> action) {
-        Objects.requireNonNull(action);
-        for (T t : this) {
-            action.accept(t);
-        }
-    }
+    //1.8新增接口
+    // 循环
+    default void forEach(Consumer<? super T> action) {}
     
-    //1.8新增接口，返回并行遍历迭代器
-    default Spliterator<T> spliterator() {
-        return Spliterators.spliteratorUnknownSize(iterator(), 0);
-    }
+    //返回并行遍历迭代器
+    default Spliterator<T> spliterator() {}
 }
 ```
 
 ## Collection
-继承结构：
-```java
-public interface Collection<E> extends Iterable<E>{}
-```
-方法说明：
 ```java
 public interface Collection<E> extends Iterable<E> {
+    
     //返回元素个数
     int size();
     
@@ -74,64 +64,175 @@ public interface Collection<E> extends Iterable<E> {
     //添加元素
     boolean add(E e);
     
+    //添加指定集合中的所有元素
     boolean addAll(Collection<? extends E> c);
     
+    //移除指定元素
     boolean remove(Object o);
     
+    //移除指定集合中的所有元素
     boolean removeAll(Collection<?> c);
     
+    //与指定集合取交集
     boolean retainAll(Collection<?> c);
     
+    //清除所有元素
     void clear();
     
+    //判断元素是否相同
     boolean equals(Object o);
     
+    //返回hashCode
     int hashCode();
     
-    default boolean removeIf(Predicate<? super E> filter) {
-        Objects.requireNonNull(filter);
-        boolean removed = false;
-        final Iterator<E> each = iterator();
-        while (each.hasNext()) {
-            if (filter.test(each.next())) {
-                each.remove();
-                removed = true;
-            }
-        }
-        return removed;
-    }
+    //1.8新增接口
+    // 删除满足条件的元素
+    default boolean removeIf(Predicate<? super E> filter) {}
     
-    default Spliterator<E> spliterator() {
-        return Spliterators.spliterator(this, 0);
-    }
+    // 返回并行遍历迭代器
+    default Spliterator<E> spliterator() {}
     
-    default Stream<E> stream() {
-            return StreamSupport.stream(spliterator(), false);
-    }
+    //返回数据视图
+    default Stream<E> stream() {}
     
-    default Stream<E> parallelStream() {
-        return StreamSupport.stream(spliterator(), true);
-    }
+    //返回并行数据视图
+    default Stream<E> parallelStream() {}
 }
 ```
 
 ## List
 继承结构：
 ```java
+public interface List<E> extends Collection<E> {
+    
+    //在指定位置添加元素
+    void add(int index, E element);
+    
+    //在指定位置添加所有集合中的元素
+    boolean addAll(int index, Collection<? extends E> c);
+    
+    //删除指定索引的元素
+    E remove(int index);
+    
+    //获取指定索引的元素
+    E get(int index);
+    
+    //获取指定元素的索引
+    int indexOf(Object o);
 
+    //获取指定元素最后一个匹配的索引
+    int lastIndexOf(Object o);
+    
+    //获取迭代器
+    ListIterator<E> listIterator();
+
+    //获取从指定位置开始的迭代器
+    ListIterator<E> listIterator(int index);
+    
+    //获取子视图
+    List<E> subList(int fromIndex, int toIndex);
+    
+    //1.8新增接口 
+    // 对每个元素执行operator指定的操作，并用操作结果来替换原来的元素。
+    default void replaceAll(UnaryOperator<E> operator) {}
+    
+    //根据c指定的比较规则对容器元素进行排序
+    default void sort(Comparator<? super E> c) {}
+}
 ```
 
-## Set
-## SortedSet
-## NavigableSet
 ## Queue
+```java
+
+```
 ## BlockingQueue
 ## Deque
 ## BlockingDeque
 
+
+## Set
+```java
+public interface Set<E> extends Collection<E> {
+    //与Collection相同
+}
+```
+## SortedSet
+```java
+```
+## NavigableSet
+
+
 ## Map
+```java
+public interface Map<K,V> {
+    
+    //返回元素个数
+    int size();
+    
+    //返回元素是否为空
+    boolean isEmpty();
+    
+    //是否包含指定的键
+    boolean containsKey(Object key);
+
+    //是否包含指定的值
+    boolean containsValue(Object value);
+    
+    V get(Object key);
+    
+    V put(K key, V value);
+    
+    V remove(Object key);
+    
+    void putAll(Map<? extends K, ? extends V> m);
+    
+    void clear();
+    
+    Set<K> keySet();
+    
+    Collection<V> values();
+    
+    Set<Map.Entry<K, V>> entrySet();
+    
+    boolean equals(Object o);
+    
+    int hashCode();
+    
+    //1.8新增接口
+    default V getOrDefault(Object key, V defaultValue) {};
+    
+    default void forEach(BiConsumer<? super K, ? super V> action) {};
+    
+    default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {};
+    
+    default V putIfAbsent(K key, V value) {};
+    
+    default boolean remove(Object key, Object value){};
+    
+    default boolean replace(K key, V oldValue, V newValue) {};
+    
+    default V replace(K key, V value) {};
+    
+    default V computeIfAbsent(K key,
+            Function<? super K, ? extends V> mappingFunction) {};
+
+    default V computeIfPresent(K key,
+            BiFunction<? super K, ? super V, ? extends V> remappingFunction) {};
+    
+    default V compute(K key,
+                 BiFunction<? super K, ? super V, ? extends V> remappingFunction) {};
+    
+    default V merge(K key, V value,
+                BiFunction<? super V, ? super V, ? extends V> remappingFunction) {};
+}    
+```
+
 ## SortedMap
 ## NavigableMap
 ## ConcurrentMap
 ## ConcurrentNavigableMap
+
+
+
+
 
