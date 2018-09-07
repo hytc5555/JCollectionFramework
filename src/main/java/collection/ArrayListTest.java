@@ -16,3 +16,4 @@ public class ArrayListTest {
         list.forEach(k-> System.out.println(k));
     }
 }
+
