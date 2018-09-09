@@ -14,11 +14,11 @@
 `parentNo = (nodeNo-1)/2`
 
 通过上述三个公式，可以轻易计算出某个节点的父节点以及子节点的下标。这也就是为什么可以直接用数组来存储堆的原因。
-## 并发情况
+## 并发
 *PriorityQueue*不是线程安全的。
-## 性能情况
+## 性能
 *PriorityQueue*的`peek()`和`element`操作是常数时间，`add()`, `offer()`, 无参数的`remove()`以及`poll()`方法的时间复杂度都是*log(N)*。
-## 遍历情况
+## 遍历
 PriorityQueue提供了升序迭代器
 
 
@@ -96,6 +96,6 @@ public class PriorityQueue<E> extends AbstractQueue<E>
     
 }
 ```
-## 重要方法剖析
+## 重要方法
 
-## 迭代器剖析
+## 迭代器
