@@ -1,3 +1,5 @@
+https://github.com/CarpenterLee/JCFInternals/blob/master/markdown/1-Overview.md
+
 # Java集合框架综述
 
 # 介绍
@@ -576,7 +578,7 @@ public interface ConcurrentMap<K, V> extends Map<K, V> {
 #### ConcurrentNavigableMap
 since1.6
 
-　ConcurrentMap支持NavigableMap操作
+　ConcurrentNavigableMap支持NavigableMap操作
 
 方法详情:<br>
 ```java
@@ -604,6 +606,3 @@ public interface ConcurrentNavigableMap<K,V> extends ConcurrentMap<K,V>, Navigab
     NavigableSet<K> descendingKeySet();
 }
 ```
-
-
-
