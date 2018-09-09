@@ -7,11 +7,11 @@ ArrayDeque使用数组存储元素，为了满足可以同时在数组两端插�
 ![ArrayDeque_base.png](../PNGFigures/ArrayDeque_base.png)
 
 上图中我们看到，**`head`指向首端第一个有效元素，`tail`指向尾端第一个可以插入元素的空位**。因为是循环数组，所以`head`不一定总等于0，`tail`也不一定总是比`head`大。
-## 并发情况
+## 并发
 ArrayDeque不是线程安全的。
-## 性能情况
+## 性能
 ArrayDeque添加和获取的速度较快，删除操作因为可能涉及到数组元素的移位较为复杂。
-## 遍历情况
+## 遍历
 ArrayDeque提供了升序迭代器和降序迭代器（获取降序迭代器的方法在Deque接口中定义），可以完成升序遍历和降序遍历。
 
 
@@ -76,7 +76,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
     }
 }
 ```
-## 重要方法剖析
+## 重要方法
 1.添加
 ```java
 //添加元素到队首
@@ -277,7 +277,7 @@ public E pop() {
     return removeFirst();
 }
 ```
-## 迭代器剖析
+## 迭代器
 ### DeqIterator
 升序迭代器，通过方法iterator()获取。
 #### 属性
