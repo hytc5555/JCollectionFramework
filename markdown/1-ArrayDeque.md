@@ -1,24 +1,24 @@
-#总体介绍
+# 总体介绍
 ArrayDeque继承自AbstractCollection类，并且实现了Deque接口，说明它是一个双端队列，可以用于实现FIFO类型，也可以用于实现LIFO类型（栈）。
-##数据结构：
+## 数据结构：
 ArrayDeque使用数组存储元素，为了满足可以同时在数组两端插入或删除元素的需求，该数组还必须是循环的，即**循环数组（circular array）**，也就是说数组的任何一点都可能被看作起点或者终点。
 另外，ArrayDeque的数组为可变数组，数组长度为2的幂次方，每次扩容后长度变为原来的两倍。
 
 ![ArrayDeque_base.png](../PNGFigures/ArrayDeque_base.png)
 
 上图中我们看到，**`head`指向首端第一个有效元素，`tail`指向尾端第一个可以插入元素的空位**。因为是循环数组，所以`head`不一定总等于0，`tail`也不一定总是比`head`大。
-##并发情况
+## 并发情况
 ArrayDeque不是线程安全的。
-##性能情况
+## 性能情况
 ArrayDeque添加和获取的速度较快，删除操作因为可能涉及到数组元素的移位较为复杂。
-##遍历情况
+## 遍历情况
 ArrayDeque提供了升序迭代器和降序迭代器（获取降序迭代器的方法在Deque接口中定义），可以完成升序遍历和降序遍历。
 
 
-#源码分析
+# 源码分析
 ArrayDeque继承自AbstractCollection类，并且实现了Deque，Cloneable和Serializable接口，Cloneable接口则表示可以进行拷贝，Serializable接口表示ArrayDeque可以被序列化。
 因为实现了Deque接口，ArrayDeque可以直接操作首部和尾部的元素。
-##成员变量
+## 成员变量
 ```java
 public class ArrayDeque<E> extends AbstractCollection<E>
                            implements Deque<E>, Cloneable, Serializable{
@@ -28,7 +28,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
     private static final int MIN_INITIAL_CAPACITY = 8;//数组的初始容量
 }
 ```
-##构造函数
+## 构造函数
 ```java
 public class ArrayDeque<E> extends AbstractCollection<E>
                            implements Deque<E>, Cloneable, Serializable{
@@ -76,7 +76,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
     }
 }
 ```
-##重要方法剖析
+## 重要方法剖析
 1.添加
 ```java
 //添加元素到队首
