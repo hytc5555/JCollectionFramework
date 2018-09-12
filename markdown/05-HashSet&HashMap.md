@@ -72,25 +72,66 @@ get(Object key)方法根据指定的key值返回对应的value,从代码中可�
 代码如下
 ```java
 final Node<K,V> getNode(int hash, Object key) {
-    
     Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
-    if ((tab = table) != null && (n = tab.length) > 0 && (first = tab[(n - 1) & hash]) != null) { //(n - 1) & hash 计算出所在的bucket
-        if (first.hash == hash && // 如果bucket中的第一个元素与传入的对象相同，直接返回
+    //上文提到的计算index的方法：(n - 1) & hash，first是这个数组table中index下标处存放的对象
+    if ((tab = table) != null && (n = tab.length) > 0 && (first = tab[(n - 1) & hash]) != null) {
+        if (first.hash == hash && // always check first node
+            //如果first对象匹配成功，则直接返回
             ((k = first.key) == key || (key != null && key.equals(k))))
             return first;
-        if ((e = first.next) != null) { //若有后继元素
-            //该bucket基于红黑树存储
+        if ((e = first.next) != null) {
+            //否则就要在index指向的链表或红黑树（如果有的话）中进行查找
             if (first instanceof TreeNode)
-                return ((TreeNode<K,V>)first).getTreeNode(hash, key);//从红黑树查找元素
-            //该bucket基于链表存储
+                //如果first节点是TreeNode对象，则说明存在的是红黑树结构，这是我们今天要关注的重点
+                return ((TreeNode<K,V>)first).getTreeNode(hash, key); 
+            //否则的话就是一个普通的链表，则从头节点开始遍历查找
             do {
                 if (e.hash == hash &&
                     ((k = e.key) == key || (key != null && key.equals(k))))
-                    return e;//若找到与key相同的元素，返回
-            } while ((e = e.next) != null);//循环链表
+                    return e;
+            } while ((e = e.next) != null);
         }
     }
-    //若table还未初始化或未找到与key相同的元素，返回null
+    return null;
+}
+
+/**
+* Calls find for root node.
+*/
+//定位到树的根节点，并调用其find方法
+final TreeNode<K,V> getTreeNode(int h, Object k) {
+    return ((parent != null) ? root() : this).find(h, k, null);
+}
+
+final TreeNode<K,V> find(int h, Object k, Class<?> kc) {
+    TreeNode<K,V> p = this; //p赋值为根节点，并从根节点开始遍历
+    do {
+        int ph, dir; K pk;
+        TreeNode<K,V> pl = p.left, pr = p.right, q;
+        if ((ph = p.hash) > h) //查找的hash值h比当前节点p的hash值ph小
+            p = pl; //在p的左子树中继续查找
+        else if (ph < h)
+            p = pr; //反之在p的右子树中继续查找
+        else if ((pk = p.key) == k || (k != null && k.equals(pk)))
+            return p; //若两节点hash值相等，且节点的key也相等，则匹配成功，返回p
+
+    /****---- 下面的情况是节点p的hash值和h相等，但key不匹配，需继续在p的子树中寻找 ----****/
+
+        else if (pl == null)
+            p = pr; //若p的左子树为空，则直接在右子树寻找。若右子树也为空，则会不满足循环条件，返回null，即未找到
+        else if (pr == null)
+            p = pl; //反之若左子树不为空，同时右子树为空，则继续在左子树中寻找
+        else if ((kc != null || (kc = comparableClassFor(k)) != null) &&
+                     (dir = compareComparables(kc, k, pk)) != 0)
+            //若k的比较函数kc不为空，且k是可比较的，则根据k和pk的比较结果来决定继续在p的哪个子树中寻找
+            p = (dir < 0) ? pl : pr;
+        //若k不可比，则只能分别去p的左右子树中碰运气了，先在p的右子树pr中寻找，结果为q
+        else if ((q = pr.find(h, k, kc)) != null)
+            return q; //若q不为空，代表匹配成功，则返回q，结束
+        else
+            p = pl; //到这里表示未能在p的右子树中匹配成功，则在左子树中继续
+    } while (p != null);
+    //各种寻找均无果，返回null，表示查找失败。
     return null;
 }
 ```
@@ -107,52 +148,152 @@ static final int hash(Object key) {
 put()方法内部调用了putVal()把映射存入hash表。
 
 ```java
-final V putVal(int hash, K key, V value, boolean onlyIfAbsent,boolean evict) {
-    Node<K,V>[] tab; //指向table
-    Node<K,V> p; 
-    int n, i; 
+final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
+               boolean evict) {
+    Node<K,V>[] tab; Node<K,V> p; int n, i;
     if ((tab = table) == null || (n = tab.length) == 0)
-        n = (tab = resize()).length;//若数组还未初始化，先调用resize()初始化数组
+        n = (tab = resize()).length; //若当前哈希数组table的长度为0，则进行扩容
+    //确定输入的hash在哈希数组中对应的下标i
     if ((p = tab[i = (n - 1) & hash]) == null)
-        //通过`hash()`函数得到对应`bucket`的下标，若该位置没有元素，将元素放在该位置
+        //若数组该位置之前没有被占用，则新建一个节点放入，插入完成。
         tab[i] = newNode(hash, key, value, null);
     else {
-        //该位置已有元素
         Node<K,V> e; K k;
-        if (p.hash == hash && //通过`key.equals(k)`方法来判断key是否相同，若相同，把元素赋值给变量e
-            ((k = p.key) == key || (key != null && key.equals(k))))
+        if (p.hash == hash && ((k = p.key) == key || (key != null && key.equals(k))))
+            //若该位置上存放的第一个节点p能与输入的节点信息匹配，则将p记录为e并结束查找
             e = p;
         else if (p instanceof TreeNode)
-            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value); //从红黑树中找出与key相同的元素，若没有返回null
+            //若该位置的第一个节点p为TreeNode类型，说明这里存放的是一棵红黑树，p为根节点。
+            //于是交给putTreeVal方法来完成后续操作，该方法下文会有详述
+            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
         else {
-            for (int binCount = 0; ; ++binCount) { //遍历冲突链表
-                if ((e = p.next) == null) { //遍历到最后一个节点还未找到相同的key，新建节点，挂在链表尾部
+            //走到这里，说明p不匹配且是一个链表的头结点，该遍历链表了
+            for (int binCount = 0; ; ++binCount) {
+                //e指向p的下一个节点
+                if ((e = p.next) == null) {
+                    //若e为空，则说明已经到表尾了还未能匹配，则在表尾处插入新节点
                     p.next = newNode(hash, key, value, null);
-                    if (binCount >= TREEIFY_THRESHOLD - 1) // 若一个bucket的元素个数大于TREEIFY_THRESHOLD，将存储结构改为红黑树
+                    if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                        //若插入后，该桶中的节点个数已达到了树化阈值
+                        //则对该桶进行树化。该部分源码下文会有详述
                         treeifyBin(tab, hash);
                     break;
                 }
-                if (e.hash == hash &&
-                    ((k = e.key) == key || (key != null && key.equals(k)))) //若找到与key相同的元素，结束循环，此时e指向该元素
+                if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k))))
+                    //匹配成功，我们需要用新的value来覆盖e节点
                     break;
-                p = e;
+
+                p = e; //循环继续
             }
         }
-        if (e != null) { // 表示map中已经存在同样的key，需要替换映射的值
-            V oldValue = e.value;
-            if (!onlyIfAbsent || oldValue == null) //适用1.8的新方法
+        //若执行到此时e不为空，则说明在map中找到了与key相匹配的节点e
+        if (e != null) { // existing mapping for key
+            V oldValue = e.value; //暂存e节点当前的值为oldValue
+            if (!onlyIfAbsent || oldValue == null)
+                //若onlyIfAbsent==true，则已存在节点的value不能被覆盖，除非其value为null
+                //否则的话，用输入的value覆盖e.value
                 e.value = value;
+            //钩子方法，这在HashMap中是个空方法，但是在其子类LinkedHashMap中会被Override
+            //通知子类：节点e被访问过了
             afterNodeAccess(e);
+            //返回已被覆盖的节点e的oldValue
             return oldValue;
         }
     }
-    ++modCount;//结构修改计数器加1
-    if (++size > threshold) //如果元素个数达到了临界值，进行扩容
-        resize();
-    afterNodeInsertion(evict); //插入后置处理，在HashMap中该方法没有任何操作
-    return null;
+
+    /****--执行到此处说明没有匹配到已存在节点，一定是有新节点插入--****/
+
+    ++modCount; //结构操作数加一
+    if (++size > threshold)
+        resize(); //插入后，map中的节点数加一，若此时已达阈值，则扩容
+    afterNodeInsertion(evict); //同样的钩子方法，通知子类有新节点插入
+    return null; //由于是新节点插入，没有节点被覆盖，故返回null
 }
 ```
+通过上面的代码可以清楚的看到插入操作的整体流程：
+
+a. 先通过key的hash定位到table数组中的一个桶位;
+
+b. 若此桶没有被占用，则新建节点，占坑，记录，考虑扩容，结束。若已被占用，则总是先与第一个节点进行一次匹配，若成功则无需后续的遍历操作，直接覆盖；否则的话需进行遍历；
+
+c. 若桶中的第一个节点p是TreeNode类型，则表示桶中存在的是一棵红黑树，于是后续操作将由putTreeVal方法来完成。否则的话说明桶中的是一个链表，则对该链表进行遍历；
+
+d. 若遍历过程中匹配到了节点e，则进行覆盖。否则的话通过遍历定位到合适的插入位置，新建节点插入，对于链表结构需考虑是否树化。最后进行操作记录，考虑扩容，结束。
+
+```java
+final void treeifyBin(Node<K,V>[] tab, int hash) {
+    int n, index; Node<K,V> e;
+    if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
+        resize(); //若table数组为空或其容量小于最小树化值，则用扩容取代树化
+    else if ((e = tab[index = (n - 1) & hash]) != null) { //定位到hash对应的桶位，头结点记为e
+        TreeNode<K,V> hd = null, tl = null; //声明两个指针分别指向链表头尾节点
+        do {
+            TreeNode<K,V> p = replacementTreeNode(e, null); //将Node类型的节点e替换为TreeNode类型的p
+            if (tl == null)
+                hd = p; //若当前链表为空，则赋值头指针为p
+            else {
+                p.prev = tl; //否则将p添加到链表尾部
+                tl.next = p;
+            }
+            tl = p; //后移尾指针
+        } while ((e = e.next) != null); //循环继续
+
+        if ((tab[index] = hd) != null) //将链表头节点放入table的index位置
+            hd.treeify(tab); //通过treeify方法将链表树化
+    }
+}
+
+final void treeify(Node<K,V>[] tab) {
+    TreeNode<K,V> root = null; //声明root变量以记录根节点
+    for (TreeNode<K,V> x = this, next; x != null; x = next) { //从调用节点this开始遍历
+        next = (TreeNode<K,V>)x.next; //暂存链表中的下一个节点，记为next
+        x.left = x.right = null; //当前节点x的左右子树置空
+        if (root == null) {
+            x.parent = null; //若root仍为空，则将x节点作为根节点
+            x.red = false; //红黑树特性之一：根节点为黑色
+            root = x; //赋值root
+        }
+        else { //否则的话需将当前节点x插入到已有的树中
+            K k = x.key;
+            int h = x.hash;
+            Class<?> kc = null;
+            //第二层循环，从根节点开始寻找适合x插入的位置，并完成插入操作。
+            //putTreeVal方法的实现跟这里十分相似。
+            for (TreeNode<K,V> p = root;;) { 
+                int dir, ph;
+                K pk = p.key;
+                if ((ph = p.hash) > h) //若x的hash值小于节点p的，则往p的左子树中继续寻找
+                    dir = -1;
+                else if (ph < h) //反之在右子树中继续
+                    dir = 1;
+                //若两节点hash值相等，且key不可比，则利用System.identityHashCode方法来决定一个方向
+                else if ((kc == null && (kc = comparableClassFor(k)) == null) ||
+                        (dir = compareComparables(kc, k, pk)) == 0)
+                   dir = tieBreakOrder(k, pk); 
+
+                TreeNode<K,V> xp = p; //将当前节点p暂存为xp
+                //根据上面算出的dir值将p向下移向其左子树或右子树，若为空，则说明找到了合适的插入位置，否则继续循环
+                if ((p = (dir <= 0) ? p.left : p.right) == null) { 
+                    //执行到这里说明找到了合适x的插入位置
+                    x.parent = xp; //将x的parent指针指向xp
+                    if (dir <= 0) //根据dir决定x是作为xp的左孩子还是右孩子
+                        xp.left = x;
+                    else
+                        xp.right = x;
+                    //由于需要维持红黑树的平衡，即始终满足其5条性质，每一次插入新节点后都需要做平衡操作
+                    //这个方法的源码我们在<<红黑树(Red-Black Tree)解析>>一文中已有详细分析，此处不再重复
+                    root = balanceInsertion(root, x);
+                    break; //插入完成，跳出循环
+                }
+            }
+        }
+    }
+    //由于插入后的平衡调整可能会更换整棵树的根节点，
+    //这里需要通过moveRootToFront方法确保table[index]中的节点与插入前相同
+    moveRootToFront(tab, root);
+}
+```
+
 ### resize()
 
 在扩容时会有4种情况<br>

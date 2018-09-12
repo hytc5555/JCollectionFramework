@@ -49,7 +49,7 @@ public class LinkedHashMap<K,V>
 ```
 ## 重要方法
 
-## newNode()
+### newNode()
 LinkedList重写了newNode方法，在put方法中创建节点时，使用LinkedHashMap.Entry类来创建，然后调用linkNodeLast()方法，该方法的作用是将元素挂在双向链表的末尾，before和after在这个方法里被赋值。
 ```java
 Node<K,V> newNode(int hash, K key, V value, Node<K,V> e) {
@@ -70,7 +70,7 @@ private void linkNodeLast(LinkedHashMap.Entry<K,V> p) {
     }
 }
 ```
-## newTreeNode()
+### newTreeNode()
 ```java
 TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
     TreeNode<K,V> p = new TreeNode<K,V>(hash, key, value, next);
@@ -79,7 +79,7 @@ TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
 }
 ```
 
-## put()
+### put()
 `put(K key, V value)`方法是将指定的`key, value`对添加到`map`里。该方法使用`HashMap.get()`实现。
 
 注意，这里的**插入有两重含义**：
@@ -117,7 +117,7 @@ void afterNodeAccess(Node<K,V> e) {
     }
 }
 ```
-## get()
+### get()
 
 `get(Object key)`方法根据指定的`key`值返回对应的`value`。该方法通过调用HashMap中的getNode()方法实现。
 
@@ -134,7 +134,7 @@ public V get(Object key) {
 }
 ```
 
-## remove()
+### remove()
 
 `remove(Object key)`的作用是删除`key`值对应的`entry`,LinkedHashMap未重写remove方法，所以调用的还是HashMap中的remove方法。
 
@@ -161,7 +161,119 @@ void afterNodeRemoval(Node<K,V> e) { // unlink
         a.before = b; 
 }
 ```
+## 视图
+### LinkedKeySet
+```java
+final class LinkedKeySet extends AbstractSet<K> {
+    public final int size()                 { return size; }
+    public final void clear()               { LinkedHashMap.this.clear(); }
+    public final Iterator<K> iterator() {
+        return new LinkedKeyIterator();
+    }
+    public final boolean contains(Object o) { return containsKey(o); }
+    public final boolean remove(Object key) {
+        return removeNode(hash(key), key, null, false, true) != null;
+    }
+    public final Spliterator<K> spliterator()  {
+        return Spliterators.spliterator(this, Spliterator.SIZED |
+                                        Spliterator.ORDERED |
+                                        Spliterator.DISTINCT);
+    }
+}
+```
+### LinkedValues
+```java
+final class LinkedValues extends AbstractCollection<V> {
+    public final int size()                 { return size; }
+    public final void clear()               { LinkedHashMap.this.clear(); }
+    public final Iterator<V> iterator() {
+        return new LinkedValueIterator();
+    }
+    public final boolean contains(Object o) { return containsValue(o); }
+    public final Spliterator<V> spliterator() {
+        return Spliterators.spliterator(this, Spliterator.SIZED |
+                                        Spliterator.ORDERED);
+    }
+}
+```
+### LinkedEntrySet
+```java
+final class LinkedEntrySet extends AbstractSet<Map.Entry<K,V>> {
+    public final int size()                 { return size; }
+    public final void clear()               { LinkedHashMap.this.clear(); }
+    public final Iterator<Map.Entry<K,V>> iterator() {
+        return new LinkedEntryIterator();
+    }
+    public final Spliterator<Map.Entry<K,V>> spliterator() {
+        return Spliterators.spliterator(this, Spliterator.SIZED |
+                                        Spliterator.ORDERED |
+                                        Spliterator.DISTINCT);
+    }
+}
+```
+## 迭代器
+### LinkedHashIterator
+```java
+abstract class LinkedHashIterator {
+    LinkedHashMap.Entry<K,V> next;
+    LinkedHashMap.Entry<K,V> current;
+    int expectedModCount;
+    
+    LinkedHashIterator() {
+        next = head;
+        expectedModCount = modCount;
+        current = null;
+    }
 
+    public final boolean hasNext() {
+        return next != null;
+    }
+
+    final LinkedHashMap.Entry<K,V> nextNode() {
+        LinkedHashMap.Entry<K,V> e = next;
+        if (modCount != expectedModCount)
+            throw new ConcurrentModificationException();
+        if (e == null)
+            throw new NoSuchElementException();
+        current = e;
+        next = e.after;
+        return e;
+    }
+
+    public final void remove() {
+        Node<K,V> p = current;
+        if (p == null)
+            throw new IllegalStateException();
+        if (modCount != expectedModCount)
+            throw new ConcurrentModificationException();
+        current = null;
+        K key = p.key;
+        removeNode(hash(key), key, null, false, false);
+        expectedModCount = modCount;
+    }
+}
+```
+### LinkedKeyIterator
+```java
+final class LinkedKeyIterator extends LinkedHashIterator
+    implements Iterator<K> {
+    public final K next() { return nextNode().getKey(); }
+}
+```
+### LinkedValueIterator
+```java
+final class LinkedValueIterator extends LinkedHashIterator
+    implements Iterator<V> {
+    public final V next() { return nextNode().value; }
+}
+```
+### LinkedEntryIterator
+```java
+final class LinkedEntryIterator extends LinkedHashIterator
+    implements Iterator<Map.Entry<K,V>> {
+    public final Map.Entry<K,V> next() { return nextNode(); }
+}
+```
 
 # LinkedHashSet
 
@@ -208,6 +320,4 @@ class FIFOCache<K, V> extends LinkedHashMap<K, V>{
 
 
 
-
-## 迭代器
 

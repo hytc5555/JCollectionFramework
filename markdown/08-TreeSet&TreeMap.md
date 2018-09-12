@@ -126,7 +126,17 @@ static <K,V> TreeMap.Entry<K,V> successor(Entry<K,V> t) {
 # 源码分析
 
 ## 成员变量
-
+```java
+public class TreeMap<K,V>
+    extends AbstractMap<K,V>
+    implements NavigableMap<K,V>, Cloneable, java.io.Serializable
+{
+    private final Comparator<? super K> comparator;
+    private transient Entry<K,V> root = null;
+    private transient int size = 0;
+    private transient int modCount = 0;
+}
+```
 
 ## 重要方法
 
@@ -359,7 +369,60 @@ private void fixAfterDeletion(Entry<K,V> x) {
 }
 ```
 
-## 迭代器
+## 视图
+### KeySet
+```java
+    static final class KeySet<E> extends AbstractSet<E> implements NavigableSet<E> {
+        private final NavigableMap<E, ?> m;
+        KeySet(NavigableMap<E,?> map) { m = map; }
+        
+        public Iterator<E> iterator() {
+            if (m instanceof TreeMap)
+                return ((TreeMap<E,?>)m).keyIterator();
+            else
+                return ((TreeMap.NavigableSubMap<E,?>)m).keyIterator();
+        }
+        
+        public Iterator<E> descendingIterator() {
+            if (m instanceof TreeMap)
+                return ((TreeMap<E,?>)m).descendingKeyIterator();
+            else
+                return ((TreeMap.NavigableSubMap<E,?>)m).descendingKeyIterator();
+        }
+        public Spliterator<E> spliterator() {
+            return keySpliteratorFor(m);
+        }
+        ......
+    }
+```
+### Values
+```java
+class Values extends AbstractCollection<V> {
+    public Iterator<V> iterator() {
+        return new ValueIterator(getFirstEntry());
+    }
+    
+    public Spliterator<V> spliterator() {
+        return new ValueSpliterator<K,V>(TreeMap.this, null, null, 0, -1, 0);
+    }
+}
+```
+### EntrySet
+```java
+class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+    public Iterator<Map.Entry<K,V>> iterator() {
+        return new EntryIterator(getFirstEntry());
+    }
+    
+    public Spliterator<Map.Entry<K,V>> spliterator() {
+        return new EntrySpliterator<K,V>(TreeMap.this, null, null, 0, -1, 0);
+    }
+}
+```
+## TreeMap内部类
+![TreeMap_base.png](../PNGFigures/TreeMap_inner.jpg)
+
+
 
 # TreeSet
 
