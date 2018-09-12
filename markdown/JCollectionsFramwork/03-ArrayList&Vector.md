@@ -6,7 +6,7 @@ ArrayList实现了List接口，可以通过索引操作元素，ArrayList是一�
 
 ## 数据结构：
 ArrayList底层使用数组存储元素，每个ArrayList都有一个容量（capacity），表示底层数组的实际大小，容器内存储元素的个数不能多于当前容量。当向容器中添加元素时，如果容量不足，容器会自动增大底层数组的大小，每次扩容为原先的1.5倍。
-![ArrayList_base](../PNGFigures/ArrayList_base.png)
+![ArrayList_base](../../PNGFigures/ArrayList_base.png)
 
 ## 并发
 为追求效率，ArrayList没有实现同步（synchronized），如果需要多个线程并发访问，用户可以手动同步，也可使用Vector替代。

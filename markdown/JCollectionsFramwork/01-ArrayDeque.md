@@ -6,7 +6,7 @@ ArrayDeque实现了Deque接口，*Deque*的含义是“double ended queue”，�
 ArrayDeque使用数组存储元素，为了满足可以同时在数组两端插入或删除元素的需求，该数组还必须是循环的，即**循环数组（circular array）**，也就是说数组的任何一点都可能被看作起点或者终点。
 另外，ArrayDeque的数组为可变数组，数组长度必为2的幂次方，每次扩容后长度变为原来的两倍。
 
-![ArrayDeque_base.png](../PNGFigures/ArrayDeque_base.png)
+![ArrayDeque_base.png](../../PNGFigures/ArrayDeque_base.png)
 
 上图中我们看到，**`head`指向首端第一个有效元素，`tail`指向尾端第一个可以插入元素的空位**。因为是循环数组，所以`head`不一定总等于0，`tail`也不一定总是比`head`大。
 ## 并发
@@ -40,7 +40,7 @@ public class ArrayDeque<E> extends AbstractCollection<E>
 
 `addFirst(E e)`的作用是在*Deque*的首端插入元素，也就是在`head`的前面插入元素，在空间足够且下标没有越界的情况下，只需要将`elements[--head] = e`即可。
 
-![ArrayDeque_addFirst.png](../PNGFigures/ArrayDeque_addFirst.png)
+![ArrayDeque_addFirst.png](../../PNGFigures/ArrayDeque_addFirst.png)
 
 实际需要考虑：1.空间是否够用，以及2.下标是否越界的问题。上图中，如果`head`为`0`之后接着调用`addFirst()`，虽然空余空间还够用，但`head`为`-1`，下标越界了。下列代码很好的解决了这两个问题。
 ```Java
@@ -60,7 +60,7 @@ public void addFirst(E e) {
 
 下面再说说扩容函数`doubleCapacity()`，其逻辑是申请一个更大的数组（原数组的两倍），然后将原数组复制过去。过程如下图所示：
 
-![ArrayDeque_doubleCapacity.png](../PNGFigures/ArrayDeque_doubleCapacity.png)
+![ArrayDeque_doubleCapacity.png](../../PNGFigures/ArrayDeque_doubleCapacity.png)
 
 图中我们看到，复制分两次进行，第一次复制`head`右边的元素，第二次复制`head`左边的元素。
 
@@ -87,7 +87,7 @@ private void doubleCapacity() {
 
 `addLast(E e)`的作用是在*Deque*的尾端插入元素，也就是在`tail`的位置插入元素，由于`tail`总是指向下一个可以插入的空位，因此只需要`elements[tail] = e;`即可。插入完成后再检查空间，如果空间已经用光，则调用`doubleCapacity()`进行扩容。
 
-![ArrayDeque_addLast.png](../PNGFigures/ArrayDeque_addLast.png)
+![ArrayDeque_addLast.png](../../PNGFigures/ArrayDeque_addLast.png)
 
 ```Java
 public void addLast(E e) {

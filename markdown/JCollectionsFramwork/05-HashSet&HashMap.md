@@ -9,7 +9,7 @@ https://github.com/CarpenterLee/JCFInternals/edit/master/markdown/6-HashSet%20an
 ## 数据结构
 HashMap使用hash表存储元素，跟*TreeMap*不同，该容器不保证元素顺序，根据需要该容器可能会对元素重新哈希，元素的顺序也会被重新打散，因此不同时间迭代同一个*HashMap*的顺序可能会不同。
 根据对冲突的处理方式不同，哈希表有两种实现方式，一种开放地址方式（Open addressing），另一种是冲突链表方式（Separate chaining with linked lists）。**Java *HashMap*采用的是冲突链表方式**。
-![HashMap_base](../PNGFigures/HashMap_base.png)
+![HashMap_base](../../PNGFigures/HashMap_base.png)
 
 ## 并发
 HashSet和HashMap为线程不同步
@@ -66,7 +66,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 ### get()
 get(Object key)方法根据指定的key值返回对应的value,从代码中可以看到，add方法调用了getNode(hash,key)方法来获取entry。
 思想是首先通过`hash()`函数得到对应`bucket`的下标，然后依次遍历冲突链表，通过`key.equals(k)`方法来判断是否是要找的那个`entry`。
-![HashMap_getEntry](../PNGFigures/HashMap_getEntry.png)
+![HashMap_getEntry](../../PNGFigures/HashMap_getEntry.png)
 上图中`hash(k)&(table.length-1)`等价于`hash(k)%table.length`，原因是*HashMap*要求`table.length`必须是2的指数，因此`table.length-1`就是二进制低位全是1，跟`hash(k)`相与会将哈希值的高位全抹掉，剩下的就是余数了。<br>
 
 代码如下
@@ -387,7 +387,7 @@ final Node<K,V>[] resize() {
 ### remove()
 
 `remove(Object key)`的作用是删除`key`值对应的`entry`，该方法的具体逻辑是在`removeNode()`里实现的。`removeNode()`方法会首先找到`key`值对应的`entry`，然后删除该`entry`（修改链表的相应引用）。
-![HashMap_removeEntryForKey](../PNGFigures/HashMap_removeEntryForKey.png)
+![HashMap_removeEntryForKey](../../PNGFigures/HashMap_removeEntryForKey.png)
 
 ```Java
 final Node<K,V> removeNode(int hash, Object key, Object value,

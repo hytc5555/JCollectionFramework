@@ -3,7 +3,7 @@ HashTable继承自Dictionary抽象类，实现了Map接口。Dictionary比Map多
 
 ## 数据结构
 HashTable使用hash表存储元素，**Java *HashTable*采用冲突链表方式**解决hash冲突。
-![HashMap_base](../PNGFigures/HashMap_base.png)
+![HashMap_base](../../PNGFigures/HashMap_base.png)
 
 ## 并发
 HashTable是线程同步的，使用synchronized关键字修饰方法，使用的锁是类实例。

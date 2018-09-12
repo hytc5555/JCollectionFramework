@@ -18,7 +18,7 @@ Java容器里只能放对象，对于基本类型（int, long, float, double等�
 # 集合接口
 为了规范容器的行为，统一设计，JCF定义了14种容器接口（collection interfaces）。它们的关系如下图所示：<br>
 *Map*接口没有继承自*Collection*接口，因为*Map*表示的是关联式容器而不是集合。
-![pic](../PNGFigures/JCF_Collection_Interfaces.png)
+![pic](../../PNGFigures/JCF_Collection_Interfaces.png)
 
 # 集合实现
 上述接口的通用实现见下表：
