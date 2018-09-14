@@ -1,10 +1,9 @@
 package Annotation;
 
-import org.springframework.stereotype.Controller;
-
 @ClassAnnotation(values="myclass",name="myclass")
-@Controller
-public class MyAnnotation extends SuperAnnotaton{
+@RepeatableAnnotation("123")
+@RepeatableAnnotation("234")
+public class MyAnnotationDemo extends @SuperAnnotation SuperAnnotatonDemo {
 
 
     @FieldAnnotation("name")
@@ -14,24 +13,24 @@ public class MyAnnotation extends SuperAnnotaton{
     public String value;
 
     @ConstractorAnnotation("ConstractorAnnotation")
-    public MyAnnotation(){
+    public MyAnnotationDemo(){
     }
 
 
     @ConstractorAnnotation("ConstractorAnnotation")
-    public MyAnnotation(String name){
+    private MyAnnotationDemo(String name){
 
     }
 
 
     @ConstractorAnnotation("ConstractorAnnotation")
-    public MyAnnotation(String name,String value){
+    public MyAnnotationDemo(String name, String value){
 
     }
 
     @MethodAnnotation("method")
-    public void annoTest(){
-
+    public @SuperAnnotation String annoTest(String name){
+        return "";
     }
 
     public void setValue(String value) {
