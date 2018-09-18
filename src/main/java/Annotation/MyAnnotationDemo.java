@@ -30,7 +30,12 @@ public class MyAnnotationDemo extends @SuperAnnotation SuperAnnotatonDemo {
 
     @MethodAnnotation("method")
     public @SuperAnnotation String annoTest(String name){
-        return "";
+        System.out.println("annoTest:"+name);
+        return "123";
+    }
+
+    public static String staticTest(){
+        return "234";
     }
 
     public void setValue(String value) {

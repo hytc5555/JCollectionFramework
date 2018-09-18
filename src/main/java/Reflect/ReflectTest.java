@@ -31,6 +31,10 @@ public class ReflectTest {
             int modi = cl.getModifiers();
             System.out.println(Modifier.isPublic(modi));
             System.out.println(Modifier.toString(modi));
+            //获取父类
+            cl.getSuperclass();
+            //获取接口
+            cl.getInterfaces();
             //获取类上的注解
             boolean hasAnnotation = cl.isAnnotation();//是否是注解
             boolean hasAnno = cl.isAnnotationPresent(SuperAnnotation.class);//是否包含某种类型的注解
@@ -56,7 +60,7 @@ public class ReflectTest {
                 System.out.println(Modifier.isPublic(fieldModi));
                 //成员变量类型
                 field.getGenericType();//可以获取到泛型
-                System.out.println(field.getType().getSimpleName());
+                field.getType().getSimpleName();
                 //成员变量名称
                 System.out.println(field.getName());
                 //获取一个对象中改属性的值
@@ -87,17 +91,29 @@ public class ReflectTest {
             Class class1 = method1.getReturnType();//获取方法返回值类型
             Type type = method1.getGenericReturnType();//获取方法返回值类型，包括泛型
             AnnotatedType annotatedType = method1.getAnnotatedReturnType();//获取方法返回类型注解
-
+            Parameter[] parameters = method1.getParameters();
+            for (Parameter parameter : parameters){
+                parameter.getName();
+            }
+            method1.getParameterCount();
+           String result = (String)method1.invoke(cl.newInstance(),"12");
+            Method method3 = cl.getMethod("staticTest");
+            String result2 =(String) method3.invoke(null);
 
 
             //获取 Constructor
             Constructor<?>[] constructors = cl.getConstructors();
             Constructor<?>[] constructors2 = cl.getDeclaredConstructors();
             Constructor<MyAnnotationDemo> constructor1 = cl.getConstructor();
+            constructor1.newInstance();
 
+            cl.isArray();
 
+            cl.isEnum();
+            cl.getEnumConstants();
+            field1.isEnumConstant();
 
-
+            cl.getDeclaredClasses();
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
