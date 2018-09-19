@@ -1,5 +1,7 @@
 package Annotation;
 
+import GenericTest.CommonResource;
+
 @ClassAnnotation(values="myclass",name="myclass")
 @RepeatableAnnotation("123")
 @RepeatableAnnotation("234")
@@ -29,9 +31,9 @@ public class MyAnnotationDemo extends @SuperAnnotation SuperAnnotatonDemo {
     }
 
     @MethodAnnotation("method")
-    public @SuperAnnotation String annoTest(String name){
+    public  CommonResource<String> annoTest(String name){
         System.out.println("annoTest:"+name);
-        return "123";
+        return new CommonResource<>();
     }
 
     public static String staticTest(){

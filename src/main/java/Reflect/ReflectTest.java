@@ -96,16 +96,31 @@ public class ReflectTest {
                 parameter.getName();
             }
             method1.getParameterCount();
-           String result = (String)method1.invoke(cl.newInstance(),"12");
+          // String result = (String)method1.invoke(cl.newInstance(),"12");
             Method method3 = cl.getMethod("staticTest");
             String result2 =(String) method3.invoke(null);
 
+            Class<?> cll = method1.getReturnType();
+            Type type1 =  method1.getGenericReturnType();
+            AnnotatedType annotatedType3 =  method1.getAnnotatedReturnType();
+
+
+
+            System.out.println(annotatedType3 instanceof AnnotatedParameterizedType);
+            System.out.println(method1.getGenericReturnType() instanceof ParameterizedType);
+            System.out.println(type1.equals(annotatedType3.getType()));
+
+
+            System.out.println(method1.getAnnotatedReceiverType());
 
             //获取 Constructor
             Constructor<?>[] constructors = cl.getConstructors();
             Constructor<?>[] constructors2 = cl.getDeclaredConstructors();
             Constructor<MyAnnotationDemo> constructor1 = cl.getConstructor();
             constructor1.newInstance();
+
+            System.out.println(method3.isSynthetic());
+
 
             cl.isArray();
 
