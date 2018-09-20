@@ -14,7 +14,7 @@ public class CommonServiceImpl<E> implements CommonService<E>{
     }
 
     @Override
-    public boolean addAll(Collection<E> c,E... ts) {
+    public boolean addAll(Collection<?> c, E... ts) {
         return false;
     }
 

@@ -6,7 +6,7 @@ public interface CommonService<E> {
 
     int add(E e);
 
-    boolean addAll(Collection<E> c,E... ts);
+    boolean addAll(Collection<?> c,E... ts);
 
     E get(E e);
 

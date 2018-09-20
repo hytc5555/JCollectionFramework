@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 
 @SuperAnnotation
 @Controller
-public class SuperAnnotatonDemo {
+public class SuperAnnotatonDemo<T> {
 
     public String name1;
 

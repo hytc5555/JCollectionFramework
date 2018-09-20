@@ -25,6 +25,22 @@ public interface Member {
 
 AnnotatedElement，用于操作注解
 ```java
+public interface AnnotatedElement {
+    
+    default boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) { }
+    
+    <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+    
+    Annotation[] getAnnotations();
+    
+    default <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) { }
+     
+    default <T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass) { }
+     
+    default <T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass) { }
+    
+    Annotation[] getDeclaredAnnotations();
+}
 
 ```
 
@@ -101,7 +117,6 @@ public abstract class Executable extends AccessibleObject
             return getExceptionTypes();
     }
     
-
     //获取异常的注解类型数组
     public AnnotatedType[] getAnnotatedExceptionTypes() {
         return TypeAnnotationParser.buildAnnotatedTypes(getTypeAnnotationBytes0(),
@@ -281,24 +296,9 @@ class Field extends AccessibleObject implements Member {
                 return getType();
         }
         
-        public String toGenericString() {
-            int mod = getModifiers();
-            Type fieldType = getGenericType();
-            return (((mod == 0) ? "" : (Modifier.toString(mod) + " "))
-                + fieldType.getTypeName() + " "
-                + getDeclaringClass().getTypeName() + "."
-                + getName());
-        }
+        public String toGenericString() {}
         
         //获取注解类型
-        public AnnotatedType getAnnotatedType() {
-            return TypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
-                                                               sun.misc.SharedSecrets.getJavaLangAccess().
-                                                                   getConstantPool(getDeclaringClass()),
-                                                               this,
-                                                               getDeclaringClass(),
-                                                               getGenericType(),
-                                                               TypeAnnotation.TypeAnnotationTarget.FIELD);
-        }
+        public AnnotatedType getAnnotatedType() {}
 }
 ```

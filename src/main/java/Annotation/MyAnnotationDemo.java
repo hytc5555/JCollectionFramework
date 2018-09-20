@@ -5,9 +5,10 @@ import GenericTest.CommonResource;
 @ClassAnnotation(values="myclass",name="myclass")
 @RepeatableAnnotation("123")
 @RepeatableAnnotation("234")
-public class MyAnnotationDemo extends @SuperAnnotation SuperAnnotatonDemo {
+public class MyAnnotationDemo<T> extends @SuperAnnotation SuperAnnotatonDemo<T> {
 
 
+    private T t;
     @FieldAnnotation("name")
     private String name;
 
@@ -31,9 +32,9 @@ public class MyAnnotationDemo extends @SuperAnnotation SuperAnnotatonDemo {
     }
 
     @MethodAnnotation("method")
-    public  CommonResource<String> annoTest(String name){
+    public @SuperAnnotation T annoTest(String name){
         System.out.println("annoTest:"+name);
-        return new CommonResource<>();
+        return t;
     }
 
     public static String staticTest(){
