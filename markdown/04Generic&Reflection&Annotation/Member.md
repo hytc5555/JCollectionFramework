@@ -1,4 +1,4 @@
-![member](../../PNGFigures/member.png)
+![member](../../PNGFigures/member.PNG)
 
 
 Menber是成员的顶层接口，定义了成员常用的功能。
