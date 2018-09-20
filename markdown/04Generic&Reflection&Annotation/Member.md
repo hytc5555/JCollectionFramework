@@ -1,3 +1,6 @@
+![member](../../PNGFigures/member.png)
+
+
 Menber是成员的顶层接口，定义了成员常用的功能。
 ```java
 public interface Member {
